@@ -106,9 +106,20 @@ namespace Vue {
         }
 
         private updateModelProperty(propName: string, propValue: any) {
-            const hasChanged = this.model[propName] !== propValue;
+            let parent: any = this.model;
+            const names = propName.split(".");
+            for (let i = 0; i < names.length - 1; i++) {
+                let nextparent = parent[names[i]];
+                if (typeof nextparent !== "object" || nextparent === null) {
+                    nextparent = parent[names[i]] = {};
+                }
+                parent = nextparent;
+            }
+            propName = names[names.length - 1];
+
+            const hasChanged = parent[propName] !== propValue;
             if (hasChanged) {
-                this.model[propName] = propValue;
+                parent[propName] = propValue;
             }
             return hasChanged;
         }

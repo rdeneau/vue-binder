@@ -5,8 +5,7 @@
   "scripts": {
     "build:example": "tsc -p ./example/tsconfig.json",
     "build:src": "tsc -p .",
-    "build": "npm run build:src && npm run build:example",
-    "dev": "webpack --config example/webpack.config.js --watch"
+    "build": "npm run build:src && npm run build:example"
   },
   "author": "Romain DENEAU",
   "license": "MIT",

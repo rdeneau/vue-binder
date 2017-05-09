@@ -89,9 +89,19 @@ var Vue;
             });
         };
         Binder.prototype.updateModelProperty = function (propName, propValue) {
-            var hasChanged = this.model[propName] !== propValue;
+            var parent = this.model;
+            var names = propName.split(".");
+            for (var i = 0; i < names.length - 1; i++) {
+                var nextparent = parent[names[i]];
+                if (typeof nextparent !== "object" || nextparent === null) {
+                    nextparent = parent[names[i]] = {};
+                }
+                parent = nextparent;
+            }
+            propName = names[names.length - 1];
+            var hasChanged = parent[propName] !== propValue;
             if (hasChanged) {
-                this.model[propName] = propValue;
+                parent[propName] = propValue;
             }
             return hasChanged;
         };

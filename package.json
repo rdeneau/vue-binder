@@ -1,0 +1,16 @@
+{
+  "name": "vue-binder",
+  "version": "1.0.0",
+  "description": "Simple Vue-like MVVM Binder",
+  "scripts": {
+    "build:example": "tsc -p ./example/tsconfig.json",
+    "build:src": "tsc -p .",
+    "build": "npm run build:src && npm run build:example",
+    "dev": "webpack --config example/webpack.config.js --watch"
+  },
+  "author": "Romain DENEAU",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jquery": "^2.0.43"
+  }
+}

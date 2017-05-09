@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "system",
+    "outFile": "build.js"
+  },
+  "exclude": [
+    "./**/*.d.ts"
+  ],
+  "include": [
+    "./**/*.ts"
+  ]
+}

@@ -32,20 +32,20 @@
             <div class="form-group" data-vue-show="model.IsAdherent === true">
                 <label for="NumeroAdherent" class="control-label col-sm-4">Numéro</label>
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" id="NumeroAdherent" name="NumeroAdherent" value="" data-vue-model>
-                    <div class="help-block mb0">
-                        <i class="fa fa-fw fa-lightbulb-o"></i>
-                        Saisir "1" ou "2" pour sélectionner un adhérent connu.
+                    <select class="form-control" id="NumeroAdherent" name="NumeroAdherent" data-vue-model>
+                        <option value="">-- Choisir un adhérent --</option>
+                        <option value="1">1 - Personne physique : Raymond Devos</option>
+                        <option value="2">2 - Personne morale : Microsoft</option>
+                        <option value="3">3 - Adhérent inconnu</option>
+                    </select>
+                    <div class="alert alert-danger mtm mb0" data-vue-show="model.IsAdherentInconnu">
+                        <i class="fa fa-fw fa-exclamation-circle"></i>
+                        Adhérent inconnu
                     </div>
                 </div>
             </div>
 
-            <div class="alert alert-warning" data-vue-show="model.IsAdherent === true && model.NumeroAdherent.length > 0 && model.AdherentInconnu">
-                <i class="glyphicon glyphicon-exclamation-sign"></i>
-                Adhérent inconnu
-            </div>
-
-            <div data-vue-show="model.ShowPersonne">
+            <div id="blocSaisiePersonne" data-vue-show="model.ShowPersonne">
                 <div class="form-group">
                     <label for="TypePersonnePhysique" class="control-label col-sm-4">Type de personne</label>
                     <div class="col-sm-8">
@@ -64,6 +64,10 @@
                         <label for="Age" class="control-label col-sm-4">Age</label>
                         <div class="col-sm-8">
                             <input type="number" class="form-control" id="Age" name="Age" value="17" data-vue-model>
+                            <div class="help-block mb0" data-vue-show="model.Age > 0 && model.Age < 18">
+                                <i class="fa fa-fw fa-lightbulb-o"></i>
+                                Passer 18 ans, il est possible de saisir le numéro du permis de conduire.
+                            </div>
                         </div>
                     </div>
                     <div class="form-group" data-vue-show="model.Age>=18">
@@ -124,7 +128,8 @@
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
             crossorigin="anonymous"></script>
 
-    <script src="./build.js"></script>
+    <script src="../src/vue-binder.js"></script>
+    <script src="main.js"></script>
 </body>
 
 </html>

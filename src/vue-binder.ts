@@ -7,7 +7,7 @@ namespace Vue {
     export interface Options {
         keys?: Keys;
         listener?: (propName: string, propValue: any) => void;
-        modelExtensionFactory?: () => any;
+        model: any;
         root?: string;
     }
 
@@ -17,16 +17,36 @@ namespace Vue {
             show: "vue-show"
         },
         listener: (propName: string, propValue: any) => {},
-        modelExtensionFactory: () => ({}),
+        model: {},
         root: "body"
     };
 
+    class VueError extends Error {
+        constructor(public element: HTMLElement, name: string, message: string) {
+            super(message);
+            this.name = `VueError:${name}`;
+        }
+
+        static createModelBindingNameMissing(element: HTMLElement) {
+            return new VueError(element,
+                                "ModelBinding:NameMissing",
+                                "Missing name for the vue-model binding");
+        }
+
+        static createShowBindingInvalidExpression(element: HTMLElement, expression: string) {
+            return new VueError(element,
+                                "ShowBinding:InvalidExpression",
+                                `Invalid expression '${expression}' in data-vue-show attribute: expecting boolean`);
+        }
+    }
+
     export class Binder {
-        private model: any = {};
+        private model: any;
         private options: Options;
 
         constructor(options: Options) {
             this.options = $.extend(true, defaultOptions, options);
+            this.model = this.options.model;
 
             $(this.options.root).on("change input", this.fieldsSelector, event => {
                 const $field = $(event.currentTarget);
@@ -36,9 +56,8 @@ namespace Vue {
             this.refresh();
         }
 
-        getModel() {
-            const modelCopy = JSON.parse(JSON.stringify(this.model));
-            return $.extend({}, this.options.modelExtensionFactory(), modelCopy);
+        get modelCopy() {
+            return $.extend(true, {}, this.model);
         }
 
         private getSelector(key: string) {
@@ -54,7 +73,8 @@ namespace Vue {
         private getFieldValueCore($field: JQuery) {
             switch ($field.prop("type")) {
                 case "checkbox":
-                    return $field.prop("checked");
+                    const value = $field.prop("checked");
+                    return typeof value === "boolean" ? value : null;
                 case "radio":
                     return $(`input[type='radio'][name='${$field.prop("name")}']${this.getSelector("model")}:checked`).val();
                 case "number":
@@ -65,32 +85,58 @@ namespace Vue {
 
         private getFieldValue($field: JQuery) {
             let propValue = this.getFieldValueCore($field);
-            if (propValue === undefined) {
+            if (propValue === undefined || Number.isNaN(propValue)) {
                 return null;
             }
+
+            // Cas de boutons radios et d'une combobox Oui/Non
             if ($field.is("input[type='radio'], select") &&
                 typeof propValue === "string" &&
                 propValue.match(/^(true|false)$/i)) {
                 return JSON.parse(propValue.toLowerCase());
             }
+
             return propValue;
         }
 
         private readField($field: JQuery, withRefreshShow: boolean) {
             const propName = $field.data(this.options.keys.model) as string
-                          || $field.prop("name");
+                          || $field.prop("name")
+                          || $field.prop("id");
+            if (!propName) {
+                throw VueError.createModelBindingNameMissing($field[0]);
+            }
+
             const propValue = this.getFieldValue($field);
-            if (this.updateModelProperty(propName, propValue)) {
-                this.options.listener(propName, propValue);
-                if (withRefreshShow) {
-                    this.refreshShow();
-                }
+            if (!this.updateModelProperty(propName, propValue, $field)) {
+                return;
+            }
+
+            this.options.listener(propName, propValue);
+            if (withRefreshShow) {
+                this.refreshShow();
             }
         }
 
         refresh() {
-            $(this.options.root).find(this.fieldsSelector).each((_, elem) => {
-                this.readField($(elem), false);
+            const $fields = $(this.options.root).find(this.fieldsSelector);
+            $fields.each((_, elem) => {
+                let $field = $(elem);
+                if ($field.is(":radio")) {
+                    // Traitement des boutons radio en groupe
+                    // S'applique à celui qui est coché sinon au 1er du groupe
+                    const name = $field.prop("name");
+                    const $radios = $fields.filter(`[name='${name}']`);
+                    let $radio = $radios.filter(":checked");
+                    if ($radio.length === 0) {
+                        $radio = $radios.first();
+                    }
+                    if ($field.filter($radio).length === 0) {
+                        return;
+                    }
+                    $field = $radios;
+                }
+                this.readField($field, false);
             });
             this.refreshShow();
         }
@@ -99,13 +145,33 @@ namespace Vue {
             $(this.options.root).find(this.getSelector("show")).each((_, elem) => {
                 const $element = $(elem);
                 const expression = $element.data(this.options.keys.show) as string;
-                const model = this.getModel();
+                const model = this.modelCopy;
                 const shown = eval(expression);
+                if (typeof shown !== "boolean") {
+                    throw VueError.createShowBindingInvalidExpression($element[0], expression);
+                }
                 $element.toggle(shown);
             });
         }
 
-        private updateModelProperty(propName: string, propValue: any) {
+        private setFieldValue($field: JQuery, propValue: any) {
+            switch ($field.prop("type")) {
+                case "checkbox":
+                    $field.prop("checked", true)
+                          .change();
+                    break;
+                case "radio":
+                    $field.filter(`[value='${propValue}']`)
+                          .prop("checked", true)
+                          .change();
+                    break;
+                default:
+                    $field.val(propValue)
+                          .change();
+            }
+        }
+
+        private updateModelProperty(propName: string, propValue: any, $field: JQuery) {
             let parent: any = this.model;
             const names = propName.split(".");
             for (let i = 0; i < names.length - 1; i++) {
@@ -116,6 +182,23 @@ namespace Vue {
                 parent = nextparent;
             }
             propName = names[names.length - 1];
+
+            const propInfo = Object.getOwnPropertyDescriptor(parent, propName);
+            if (!propInfo || !propInfo.get) {
+                delete parent[propName];
+                Object.defineProperty(parent, propName, {
+                    configurable: false,
+                    enumerable: true,
+                    get: () => propValue,
+                    set: (val) => {
+                        propValue = val;
+                        if (val !== this.getFieldValue($field)) {
+                            this.setFieldValue($field, propValue);
+                        }
+                    }
+                });
+                return true;
+            }
 
             const hasChanged = parent[propName] !== propValue;
             if (hasChanged) {

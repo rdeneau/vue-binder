@@ -1,7 +1,7 @@
 /// <reference path="../src/vue-binder.ts" />
 
 namespace App {
-    let vm: Vue.Binder;
+    export let vm: Vue.Binder;
 
     namespace Logger {
         const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
@@ -27,74 +27,83 @@ namespace App {
 
         export function logModel() {
             if (vm) {
-                $("#model").text(JSON.stringify(vm.getModel(), null, 2));
+                $("#model").text(JSON.stringify(vm.modelCopy, null, 2));
             }
         }
     }
 
-    const adherentFieldsNames = [
-        "TypePersonne",
-        "Nom",
-        "Age",
-        "NumeroPermisConduire",
-        "RaisonSociale",
-        "FormeJuridique",
-    ];
+    class Personne {
+        IsAdherent          : boolean | null = null;
+        NumeroAdherent      : string  | null = null;
+        TypePersonne        : string  | null = null;
+        Nom                 : string  | null = null;
+        Age                 : number  | null = null;
+        NumeroPermisConduire: string  | null = null;
+        RaisonSociale       : string  | null = null;
+        FormeJuridique      : string  | null = null;
 
-    const handlers = {
-        Adherent: (isAdherent: boolean | null, adherent?: any) => {
-            modelExtension.AdherentInconnu = isAdherent === true && !adherent;
-            modelExtension.ShowPersonne    = isAdherent === false || !!adherent;
+        get IsAdherentInconnu() {
+            return this.IsAdherent === true
+                && this.NumeroAdherent.length > 0
+                && this.TypePersonne === null;
+        }
 
-            const fieldsSelector = adherentFieldsNames.map(name => `[name='${name}']`).join(", ");
-            $(`input, select`).filter(fieldsSelector).prop("disabled", false); // Débloque d'abord tous les champs pour déclencher les événements "change"
+        get IsAdherentNonRenseigne() {
+            return this.IsAdherent === true &&
+                ( !this.NumeroAdherent
+                || this.TypePersonne === null );
+        }
 
-            if (adherent) {
-                // Remplissage des informations de l'adhérent trouvé
-                // N.B. En ASP.NET MVC, en encapsulant la recherche dans un formulaire Ajax, on pourrait renvoyer directement la vue partielle avec ces infos.
-                adherentFieldsNames.forEach(name => {
-                    const value = adherent[name];
-                    const $field = $(`input[name='${name}']`);
-                    if ($field.prop("type") === "radio") {
-                        $field.filter(`[value='${value}']`).click();
-                    } else {
-                        $field.val(value);
-                        $field.change();
-                    }
-                });
-            }
+        get ShowPersonne() {
+            return this.IsAdherent === false
+                || !this.IsAdherentNonRenseigne;
+        }
 
-            $(`input, select`).filter(fieldsSelector).prop("disabled", isAdherent === true);
-        },
-        IsAdherent: (value: boolean | null) => {
-            handlers.Adherent(value);
-        },
-        NumeroAdherent: (value: any) => {
-            // Simule la recherche d'un adhérent en base
-            let adherent: any = null;
-            switch (value) {
+        searchByNumeroAdherent(numeroAdherent: string) {
+            switch (numeroAdherent) {
                 case "1":
-                    return handlers.Adherent(true, {
-                        TypePersonne: "PersonnePhysique",
-                        Nom: "Raymond Devos",
-                        Age: 80,
-                        NumeroPermisConduire: "X 112233"
-                    });
+                    this.TypePersonne = "PersonnePhysique";
+                    this.Nom = "Raymond Devos";
+                    this.Age = 80;
+                    this.NumeroPermisConduire = "110234";
+                    this.RaisonSociale = null;
+                    this.FormeJuridique = null;
+                    break;
 
                 case "2":
-                    return handlers.Adherent(true, {
-                        TypePersonne: "PersonneMorale",
-                        RaisonSociale: "Lu Dong",
-                        FormeJuridique: "EURL"
-                    });
-            }
-            handlers.Adherent(true, null);
-        }
-    };
+                    this.TypePersonne = "PersonneMorale";
+                    this.RaisonSociale = "Microsoft";
+                    this.FormeJuridique = "SA";
+                    this.Nom = null;
+                    this.Age = null;
+                    this.NumeroPermisConduire = null;
+                    break;
 
-    const modelExtension = {
-        AdherentInconnu: false,
-        ShowPersonne: false
+                default:
+                    this.TypePersonne = null;
+                    this.RaisonSociale = null;
+                    this.FormeJuridique = null;
+                    this.Nom = null;
+                    this.Age = null;
+                    this.NumeroPermisConduire = null;
+                    break;
+            }
+        }
+    }
+
+    const model = new Personne();
+    const handlers = {
+        IsAdherent: (value: boolean | null) => {
+            $("#blocSaisiePersonne")
+                .find("input, select, input-group-btn")
+                .prop("disabled", value !== false);
+            if (value) {
+                model.NumeroAdherent = "";
+            }
+        },
+        NumeroAdherent: (value: string | null) => {
+            model.searchByNumeroAdherent(value);
+        }
     };
 
     $(() => {
@@ -109,7 +118,7 @@ namespace App {
                     handler(propValue);
                 }
             },
-            modelExtensionFactory: () => modelExtension
+            model: model
         });
         Logger.logModel();
     });

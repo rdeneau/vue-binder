@@ -1,10 +1,16 @@
 var App;
 (function (App) {
+    var TypePersonne;
+    (function (TypePersonne) {
+        TypePersonne[TypePersonne["NonRenseigne"] = 0] = "NonRenseigne";
+        TypePersonne[TypePersonne["PersonnePhysique"] = 1] = "PersonnePhysique";
+        TypePersonne[TypePersonne["PersonneMorale"] = 2] = "PersonneMorale";
+    })(TypePersonne = App.TypePersonne || (App.TypePersonne = {}));
     var Personne = (function () {
         function Personne() {
             this.IsAdherent = null;
             this.NumeroAdherent = null;
-            this.TypePersonne = null;
+            this.TypePersonne = TypePersonne.NonRenseigne;
             this.Nom = null;
             this.Age = null;
             this.NumeroPermisConduire = null;
@@ -23,7 +29,7 @@ var App;
         Object.defineProperty(Personne.prototype, "IsAdherentRenseigne", {
             get: function () {
                 return this.IsAdherent === true
-                    && this.TypePersonne !== null;
+                    && this.TypePersonne !== TypePersonne.NonRenseigne;
             },
             enumerable: true,
             configurable: true
@@ -39,7 +45,7 @@ var App;
         Personne.prototype.searchByNumeroAdherent = function (numeroAdherent) {
             switch (numeroAdherent) {
                 case "1":
-                    this.TypePersonne = "PersonnePhysique";
+                    this.TypePersonne = TypePersonne.PersonnePhysique;
                     this.Nom = "Raymond Devos";
                     this.Age = 80;
                     this.NumeroPermisConduire = "110234";
@@ -47,7 +53,7 @@ var App;
                     this.FormeJuridique = null;
                     break;
                 case "2":
-                    this.TypePersonne = "PersonneMorale";
+                    this.TypePersonne = TypePersonne.PersonneMorale;
                     this.RaisonSociale = "Microsoft";
                     this.FormeJuridique = "SA";
                     this.Nom = null;
@@ -55,7 +61,7 @@ var App;
                     this.NumeroPermisConduire = null;
                     break;
                 default:
-                    this.TypePersonne = null;
+                    this.TypePersonne = TypePersonne.NonRenseigne;
                     this.RaisonSociale = null;
                     this.FormeJuridique = null;
                     this.Nom = null;

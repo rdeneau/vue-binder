@@ -2,6 +2,7 @@ namespace Vue {
     export interface Keys {
         model: string;
         show: string;
+        type: string;
     }
 
     export interface Options {
@@ -14,7 +15,8 @@ namespace Vue {
     const defaultOptions: Options = {
         keys: {
             model: "vue-model",
-            show: "vue-show"
+            show: "vue-show",
+            type: "vue-type"
         },
         listener: (propName: string, propValue: any) => {},
         model: {},
@@ -78,23 +80,30 @@ namespace Vue {
                     return typeof value === "boolean" ? value : null;
                 case "radio":
                     return $(`input[type='radio'][name='${$field.prop("name")}']${this.getSelector("model")}:checked`).val();
-                case "number":
-                    return parseFloat($field.val());
             }
             return $field.val();
         }
 
         private getFieldValue($field: JQuery) {
             let propValue = this.getFieldValueCore($field);
-            if (propValue === undefined || Number.isNaN(propValue)) {
+            if (propValue === undefined) {
                 return null;
             }
 
-            // Cas de boutons radios et d'une combobox Oui/Non
-            if ($field.is("input[type='radio'], select") &&
-                typeof propValue === "string" &&
-                propValue.match(/^(true|false)$/i)) {
-                return JSON.parse(propValue.toLowerCase());
+            // Conversion
+            const type = $field.data(this.options.keys.type) || $field.prop("type");
+            switch (type) {
+                case "boolean":
+                    return propValue.match(/^(true|false)$/i)
+                            ? JSON.parse(propValue.toLowerCase())
+                            : null;
+
+                case "number":
+                    propValue = parseFloat(propValue);
+                    if (Number.isNaN(propValue)) {
+                        return null;
+                    }
+                    break;
             }
 
             return propValue;

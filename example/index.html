@@ -25,8 +25,8 @@
             <div class="form-group">
                 <label for="IsAdherent" class="control-label col-sm-4">Adhérent</label>
                 <div class="col-sm-8">
-                    <label class="radio-inline"><input type="radio" name="IsAdherent" id="IsAdherent" value="true" data-vue-model>Oui</label>
-                    <label class="radio-inline"><input type="radio" name="IsAdherent" id="IsNotAdherent" value="false" data-vue-model>Non</label>
+                    <label class="radio-inline"><input type="radio" name="IsAdherent" id="IsAdherent"    value="true"  data-vue-model data-vue-type="boolean">Oui</label>
+                    <label class="radio-inline"><input type="radio" name="IsAdherent" id="IsNotAdherent" value="false" data-vue-model data-vue-type="boolean">Non</label>
                 </div>
             </div>
             <div class="form-group" data-vue-show="model.IsAdherent === true">
@@ -49,11 +49,14 @@
                 <div class="form-group">
                     <label for="TypePersonnePhysique" class="control-label col-sm-4">Type de personne</label>
                     <div class="col-sm-8">
-                        <label class="radio-inline"><input type="radio" name="TypePersonne" id="TypePersonnePhysique" value="PersonnePhysique" data-vue-model>Personne Physique</label>
-                        <label class="radio-inline"><input type="radio" name="TypePersonne" id="TypePersonneMorale" value="PersonneMorale" data-vue-model>Personne Morale</label>
+                        <label class="radio-inline"       ><input type="radio" name="TypePersonne" id="TypePersonnePhysique"     value="1" data-vue-model data-vue-type="number"        >Personne Physique</label>
+                        <label class="radio-inline"       ><input type="radio" name="TypePersonne" id="TypePersonneMorale"       value="2" data-vue-model data-vue-type="number"        >Personne Morale</label>
+                        <label class="radio-inline hidden"><input type="radio" name="TypePersonne" id="TypePersonneNonRenseigne" value="0" data-vue-model data-vue-type="number" checked>Non renseigné</label>
                     </div>
                 </div>
-                <div data-vue-show="model.TypePersonne=='PersonnePhysique'">
+
+                <!-- Personne physique -->
+                <div data-vue-show="model.TypePersonne==1">
                     <div class="form-group">
                         <label for="Nom" class="control-label col-sm-4">Nom</label>
                         <div class="col-sm-8">
@@ -77,7 +80,9 @@
                         </div>
                     </div>
                 </div>
-                <div data-vue-show="model.TypePersonne=='PersonneMorale'">
+
+                <!-- Personne morale -->
+                <div data-vue-show="model.TypePersonne==2">
                     <div class="form-group">
                         <label for="RaisonSociale" class="control-label col-sm-4">Raison sociale</label>
                         <div class="col-sm-8">

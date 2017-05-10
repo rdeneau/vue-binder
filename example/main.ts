@@ -1,4 +1,5 @@
 /// <reference path="../src/vue-binder.ts" />
+/// <reference path="personne.ts" />
 
 namespace App {
     export let vm: Vue.Binder;
@@ -28,65 +29,6 @@ namespace App {
         export function logModel() {
             if (vm) {
                 $("#model").text(JSON.stringify(vm.modelCopy, null, 2));
-            }
-        }
-    }
-
-    class Personne {
-        IsAdherent          : boolean | null = null;
-        NumeroAdherent      : string  | null = null;
-        TypePersonne        : string  | null = null;
-        Nom                 : string  | null = null;
-        Age                 : number  | null = null;
-        NumeroPermisConduire: string  | null = null;
-        RaisonSociale       : string  | null = null;
-        FormeJuridique      : string  | null = null;
-
-        get IsAdherentInconnu() {
-            return this.IsAdherent === true
-                && this.NumeroAdherent.length > 0
-                && this.TypePersonne === null;
-        }
-
-        get IsAdherentNonRenseigne() {
-            return this.IsAdherent === true &&
-                ( !this.NumeroAdherent
-                || this.TypePersonne === null );
-        }
-
-        get ShowPersonne() {
-            return this.IsAdherent === false
-                || !this.IsAdherentNonRenseigne;
-        }
-
-        searchByNumeroAdherent(numeroAdherent: string) {
-            switch (numeroAdherent) {
-                case "1":
-                    this.TypePersonne = "PersonnePhysique";
-                    this.Nom = "Raymond Devos";
-                    this.Age = 80;
-                    this.NumeroPermisConduire = "110234";
-                    this.RaisonSociale = null;
-                    this.FormeJuridique = null;
-                    break;
-
-                case "2":
-                    this.TypePersonne = "PersonneMorale";
-                    this.RaisonSociale = "Microsoft";
-                    this.FormeJuridique = "SA";
-                    this.Nom = null;
-                    this.Age = null;
-                    this.NumeroPermisConduire = null;
-                    break;
-
-                default:
-                    this.TypePersonne = null;
-                    this.RaisonSociale = null;
-                    this.FormeJuridique = null;
-                    this.Nom = null;
-                    this.Age = null;
-                    this.NumeroPermisConduire = null;
-                    break;
             }
         }
     }

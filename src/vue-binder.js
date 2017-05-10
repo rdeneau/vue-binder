@@ -53,8 +53,9 @@ var Vue;
             enumerable: true,
             configurable: true
         });
-        Binder.prototype.getSelector = function (key) {
-            return "[data-" + this.options.keys[key] + "]";
+        Binder.prototype.getSelector = function (key, value) {
+            value = value ? "='" + value + "'" : "";
+            return "[data-" + this.options.keys[key] + value + "]";
         };
         Object.defineProperty(Binder.prototype, "fieldsSelector", {
             get: function () {
@@ -98,7 +99,7 @@ var Vue;
                 throw VueError.createModelBindingNameMissing($field[0]);
             }
             var propValue = this.getFieldValue($field);
-            if (!this.updateModelProperty(propName, propValue, $field)) {
+            if (!this.updateModelProperty(propName, propValue)) {
                 return;
             }
             this.options.listener(propName, propValue);
@@ -140,7 +141,12 @@ var Vue;
                 $element.toggle(shown);
             });
         };
-        Binder.prototype.setFieldValue = function ($field, propValue) {
+        Binder.prototype.setFieldValue = function (propName, propValue) {
+            var $fields = $(this.options.root).find(this.fieldsSelector);
+            var $field = $fields.filter(this.getSelector("model", propName) + ", [name='" + propName + "']");
+            if (propValue === this.getFieldValue($field)) {
+                return;
+            }
             switch ($field.prop("type")) {
                 case "checkbox":
                     $field.prop("checked", true)
@@ -156,7 +162,7 @@ var Vue;
                         .change();
             }
         };
-        Binder.prototype.updateModelProperty = function (propName, propValue, $field) {
+        Binder.prototype.updateModelProperty = function (propName, propValue) {
             var _this = this;
             var parent = this.model;
             var names = propName.split(".");
@@ -177,9 +183,7 @@ var Vue;
                     get: function () { return propValue; },
                     set: function (val) {
                         propValue = val;
-                        if (val !== _this.getFieldValue($field)) {
-                            _this.setFieldValue($field, propValue);
-                        }
+                        _this.setFieldValue(propName, propValue);
                     }
                 });
                 return true;

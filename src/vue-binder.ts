@@ -60,8 +60,9 @@ namespace Vue {
             return $.extend(true, {}, this.model);
         }
 
-        private getSelector(key: string) {
-            return `[data-${this.options.keys[key]}]`;
+        private getSelector(key: string, value?: string) {
+            value = value ? `='${value}'` : "";
+            return `[data-${this.options.keys[key]}${value}]`;
         }
 
         private get fieldsSelector() {
@@ -108,7 +109,7 @@ namespace Vue {
             }
 
             const propValue = this.getFieldValue($field);
-            if (!this.updateModelProperty(propName, propValue, $field)) {
+            if (!this.updateModelProperty(propName, propValue)) {
                 return;
             }
 
@@ -154,7 +155,12 @@ namespace Vue {
             });
         }
 
-        private setFieldValue($field: JQuery, propValue: any) {
+        private setFieldValue(propName: string, propValue: any) {
+            const $fields = $(this.options.root).find(this.fieldsSelector);
+            const $field = $fields.filter(`${this.getSelector("model", propName)}, [name='${propName}']`);
+            if (propValue === this.getFieldValue($field)) {
+                return;
+            }
             switch ($field.prop("type")) {
                 case "checkbox":
                     $field.prop("checked", true)
@@ -171,7 +177,7 @@ namespace Vue {
             }
         }
 
-        private updateModelProperty(propName: string, propValue: any, $field: JQuery) {
+        private updateModelProperty(propName: string, propValue: any) {
             let parent: any = this.model;
             const names = propName.split(".");
             for (let i = 0; i < names.length - 1; i++) {
@@ -192,9 +198,7 @@ namespace Vue {
                     get: () => propValue,
                     set: (val) => {
                         propValue = val;
-                        if (val !== this.getFieldValue($field)) {
-                            this.setFieldValue($field, propValue);
-                        }
+                        this.setFieldValue(propName, propValue);
                     }
                 });
                 return true;

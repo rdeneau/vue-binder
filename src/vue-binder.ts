@@ -6,6 +6,7 @@ namespace Vue {
     }
 
     export interface Options {
+        converters?: Converters;
         keys?: Keys;
         listener?: (propName: string, propValue: any) => void;
         model: any;
@@ -13,10 +14,11 @@ namespace Vue {
     }
 
     const defaultOptions: Options = {
+        converters: localeConverters.en,
         keys: {
             model: "vue-model",
-            show: "vue-show",
-            type: "vue-type"
+            show : "vue-show",
+            type : "vue-type"
         },
         listener: (propName: string, propValue: any) => {},
         model: {},
@@ -84,29 +86,21 @@ namespace Vue {
             return $field.val();
         }
 
+        private getFieldType($field: JQuery) {
+            return $field.data(this.options.keys.type)
+                || $field.prop("type");
+        }
+
         private getFieldValue($field: JQuery) {
             let propValue = this.getFieldValueCore($field);
             if (propValue === undefined) {
                 return null;
             }
 
-            // Conversion
-            const type = $field.data(this.options.keys.type) || $field.prop("type");
-            switch (type) {
-                case "boolean":
-                    return propValue.match(/^(true|false)$/i)
-                            ? JSON.parse(propValue.toLowerCase())
-                            : null;
-
-                case "number":
-                    propValue = parseFloat(propValue);
-                    if (Number.isNaN(propValue)) {
-                        return null;
-                    }
-                    break;
-            }
-
-            return propValue;
+            const type = this.getFieldType($field);
+            const converter = this.options.converters[type] || {};
+            const parse = converter.parse || ((val: any) => val);
+            return parse(propValue);
         }
 
         private readField($field: JQuery, withRefreshShow: boolean) {
@@ -172,18 +166,19 @@ namespace Vue {
             }
             switch ($field.prop("type")) {
                 case "checkbox":
-                    $field.prop("checked", true)
-                          .change();
+                    $field.prop("checked", !!propValue);
                     break;
                 case "radio":
                     $field.filter(`[value='${propValue}']`)
-                          .prop("checked", true)
-                          .change();
+                          .prop("checked", true);
                     break;
                 default:
-                    $field.val(propValue)
-                          .change();
+                    const type = this.getFieldType($field);
+                    const converter = this.options.converters[type] || {};
+                    const format = converter.format || ((val: any) => val);
+                    $field.val(format(propValue));
             }
+            this.options.listener(propName, propValue);
         }
 
         private updateModelProperty(propName: string, propValue: any) {

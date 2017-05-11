@@ -9,13 +9,14 @@ var App;
     var Personne = (function () {
         function Personne() {
             this.IsAdherent = null;
-            this.NumeroAdherent = null;
+            this.NumeroAdherent = "";
             this.TypePersonne = TypePersonne.NonRenseigne;
-            this.Nom = null;
-            this.Age = null;
-            this.NumeroPermisConduire = null;
-            this.RaisonSociale = null;
-            this.FormeJuridique = null;
+            this.Nom = "";
+            this.Age = "";
+            this.NumeroPermisConduire = "";
+            this.RaisonSociale = "";
+            this.FormeJuridique = "";
+            this.DateCreation = "";
         }
         Object.defineProperty(Personne.prototype, "IsAdherentInconnu", {
             get: function () {
@@ -49,24 +50,27 @@ var App;
                     this.Nom = "Raymond Devos";
                     this.Age = 80;
                     this.NumeroPermisConduire = "110234";
-                    this.RaisonSociale = null;
-                    this.FormeJuridique = null;
+                    this.RaisonSociale = "";
+                    this.FormeJuridique = "";
+                    this.DateCreation = "";
                     break;
                 case "2":
                     this.TypePersonne = TypePersonne.PersonneMorale;
                     this.RaisonSociale = "Microsoft";
                     this.FormeJuridique = "SA";
-                    this.Nom = null;
-                    this.Age = null;
-                    this.NumeroPermisConduire = null;
+                    this.DateCreation = new Date(Date.parse("1975-04-04T00:00:00.000Z"));
+                    this.Nom = "";
+                    this.Age = "";
+                    this.NumeroPermisConduire = "";
                     break;
                 default:
                     this.TypePersonne = TypePersonne.NonRenseigne;
-                    this.RaisonSociale = null;
-                    this.FormeJuridique = null;
-                    this.Nom = null;
-                    this.Age = null;
-                    this.NumeroPermisConduire = null;
+                    this.RaisonSociale = "";
+                    this.FormeJuridique = "";
+                    this.DateCreation = "";
+                    this.Nom = "";
+                    this.Age = "";
+                    this.NumeroPermisConduire = "";
                     break;
             }
         };

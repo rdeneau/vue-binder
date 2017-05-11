@@ -4,16 +4,10 @@
 <head>
     <meta charset="utf-8">
     <title>Vue Binder Example</title>
-    <link rel="stylesheet"
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-          crossorigin="anonymous">
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-          rel="stylesheet"
-          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
-          crossorigin="anonymous">
-    <link href="styles.css"
-          rel="stylesheet">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="../node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css">
+    <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -66,11 +60,11 @@
                     <div class="form-group">
                         <label for="Age" class="control-label col-sm-4">Age</label>
                         <div class="col-sm-8">
-                            <input type="number" class="form-control" id="Age" name="Age" value="17" data-vue-model>
-                            <div class="help-block mb0" data-vue-show="model.Age > 0 && model.Age < 18">
+                            <input type="number" class="form-control inline-block width-auto" id="Age" name="Age" min="0" max="199" value="17" data-vue-model>
+                            <span class="help-block inline-block mb0 mls" data-vue-show="model.Age > 0 && model.Age < 18">
                                 <i class="fa fa-fw fa-lightbulb-o"></i>
-                                Passer 18 ans, il est possible de saisir le numéro du permis de conduire.
-                            </div>
+                                Passer 18 ans pour saisir le numéro du permis de conduire
+                            </span>
                         </div>
                     </div>
                     <div class="form-group" data-vue-show="model.Age>=18">
@@ -94,10 +88,21 @@
                         <div class="col-sm-8">
                             <select class="form-control" name="FormeJuridique" id="FormeJuridique" data-vue-model>
                                 <option value="EURL">EURL - Entreprise Unipersonnelle à Responsabilité Limitée</option>
-                                <option value="SA">SA - Société Anonyme</option>
+                                <option value="SA"  >SA   - Société Anonyme</option>
                                 <option value="SARL">SARL - Société à Responsabilité Limitée</option>
-                                <option value="SNC">SNC - Société en Nom Collectif</option>
+                                <option value="SNC" >SNC  - Société en Nom Collectif</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="DateCreation" class="control-label col-sm-4">Date de création</label>
+                        <div class="col-sm-3">
+                            <div class="input-group date" data-provide="datepicker">
+                                <input type="text" class="form-control" name="DateCreation" id="DateCreation" data-vue-model data-vue-type="date">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -106,8 +111,11 @@
             <div class="form-group" data-vue-show="model.IsAdherent !== null">
                 <label class="control-label col-sm-4">Newsletters</label>
                 <div class="col-sm-8">
-                    <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Sante" data-vue-model checked="checked">Santé</label>
-                    <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Sport" data-vue-model>Sport</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Culture"   data-vue-model>Culture</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Economie"  data-vue-model>Economie</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Politique" data-vue-model>Politique</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Sante"     data-vue-model checked>Santé</label>
+                    <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Sport"     data-vue-model>Sport</label>
                 </div>
             </div>
 
@@ -118,7 +126,10 @@
                         <pre id="model"></pre>
                     </div>
                     <div class="col-sm-8">
-                        <label class="control-label">Changes</label>
+                        <label class="control-label">Logs</label>
+                        <button type="button" class="btn btn-link" id="btnClearLogs">
+                            <i class="fa fa-ban mrs"></i>Effacer
+                        </button>
                         <ul id="changes"></ul>
                     </div>
                 </div>
@@ -126,13 +137,12 @@
         </form>
     </div>
 
-    <script src="https://code.jquery.com/jquery-1.12.4.js"
-            integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="
-            crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-            crossorigin="anonymous"></script>
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="../node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.js"></script>
+    <script src="../node_modules/bootstrap-datepicker/dist/locales/bootstrap-datepicker.fr.min.js"></script>
 
+    <script src="../src/converters.js"></script>
     <script src="../src/vue-binder.js"></script>
     <script src="personne.js"></script>
     <script src="main.js"></script>

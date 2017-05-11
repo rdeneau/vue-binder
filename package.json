@@ -9,6 +9,12 @@
   "author": "Romain DENEAU",
   "license": "MIT",
   "devDependencies": {
-    "@types/jquery": "^2.0.43"
+    "@types/bootstrap": "^3.3.33",
+    "@types/bootstrap-datepicker": "0.0.6",
+    "@types/jquery": "^2.0.43",
+    "bootstrap": "^3.3.7",
+    "bootstrap-datepicker": "^1.6.4",
+    "font-awesome": "^4.7.0",
+    "jquery": "^1.12.4"
   }
 }

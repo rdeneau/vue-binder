@@ -19,10 +19,14 @@ namespace App {
             return `${hms}.${ms}`;
         }
 
+        export function clearLogs() {
+            $("#changes").empty();
+        }
+
         export function logChanges(propName: string, propValue: any) {
             const prop: any = {};
             prop[propName] = propValue;
-            const time = new Date().toLocaleTimeString("fr-FR", )
+            const time = new Date().toLocaleTimeString("fr-FR");
             $("#changes").append($(`<li><code>[${getCurrentTime()}] ${JSON.stringify(prop, null, 2)}</code></li>`));
         }
 
@@ -33,23 +37,46 @@ namespace App {
         }
     }
 
+    function getTime(value: any) {
+        return value && value.getTime ? value.getTime() : 0;
+    }
+
     const model = new Personne();
     const handlers = {
-        IsAdherent: (value: boolean | null) => {
-            $("#blocSaisiePersonne")
-                .find("input, select, input-group-btn")
-                .prop("disabled", value !== false);
-            if (value) {
-                model.NumeroAdherent = "";
+        DateCreation: (value: any) => {
+            const $dateCreation = $("input#DateCreation");
+            const dateCreation = $dateCreation.datepicker("getDate");
+            if (!dateCreation) {
+                $dateCreation.datepicker("setDate", value);
             }
         },
-        NumeroAdherent: (value: string | null) => {
+        IsAdherent: (value: boolean | null) => {
+            $("#blocSaisiePersonne")
+                .find("input, input-group-btn, select")
+                .prop("disabled", value !== false);
+            if (value) {
+                handlers.NumeroAdherent(model.NumeroAdherent);
+            }
+        },
+        NumeroAdherent: (value: string) => {
             model.searchByNumeroAdherent(value);
         }
     };
 
     $(() => {
+        $("#btnClearLogs").click(() => {
+            Logger.clearLogs();
+        });
+
+        $(".container .input-group.date").datepicker({
+            autoclose: true,
+            language: "fr",
+            todayBtn: "linked",
+            todayHighlight: true
+        });
+
         vm = new Vue.Binder({
+            model: model,
             root: ".container",
             listener: (propName: string, propValue: any) => {
                 Logger.logModel();
@@ -60,7 +87,7 @@ namespace App {
                     handler(propValue);
                 }
             },
-            model: model
+            converters: Vue.localeConverters.fr
         });
         Logger.logModel();
     });

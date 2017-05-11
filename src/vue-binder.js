@@ -11,6 +11,7 @@ var __extends = (this && this.__extends) || (function () {
 var Vue;
 (function (Vue) {
     var defaultOptions = {
+        converters: Vue.localeConverters.en,
         keys: {
             model: "vue-model",
             show: "vue-show",
@@ -78,25 +79,19 @@ var Vue;
             }
             return $field.val();
         };
+        Binder.prototype.getFieldType = function ($field) {
+            return $field.data(this.options.keys.type)
+                || $field.prop("type");
+        };
         Binder.prototype.getFieldValue = function ($field) {
             var propValue = this.getFieldValueCore($field);
             if (propValue === undefined) {
                 return null;
             }
-            var type = $field.data(this.options.keys.type) || $field.prop("type");
-            switch (type) {
-                case "boolean":
-                    return propValue.match(/^(true|false)$/i)
-                        ? JSON.parse(propValue.toLowerCase())
-                        : null;
-                case "number":
-                    propValue = parseFloat(propValue);
-                    if (Number.isNaN(propValue)) {
-                        return null;
-                    }
-                    break;
-            }
-            return propValue;
+            var type = this.getFieldType($field);
+            var converter = this.options.converters[type] || {};
+            var parse = converter.parse || (function (val) { return val; });
+            return parse(propValue);
         };
         Binder.prototype.readField = function ($field, withRefreshShow) {
             var propName = $field.data(this.options.keys.model)
@@ -156,18 +151,19 @@ var Vue;
             }
             switch ($field.prop("type")) {
                 case "checkbox":
-                    $field.prop("checked", true)
-                        .change();
+                    $field.prop("checked", !!propValue);
                     break;
                 case "radio":
                     $field.filter("[value='" + propValue + "']")
-                        .prop("checked", true)
-                        .change();
+                        .prop("checked", true);
                     break;
                 default:
-                    $field.val(propValue)
-                        .change();
+                    var type = this.getFieldType($field);
+                    var converter = this.options.converters[type] || {};
+                    var format = converter.format || (function (val) { return val; });
+                    $field.val(format(propValue));
             }
+            this.options.listener(propName, propValue);
         };
         Binder.prototype.updateModelProperty = function (propName, propValue) {
             var _this = this;

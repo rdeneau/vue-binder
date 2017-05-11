@@ -7,13 +7,14 @@ namespace App {
 
     export class Personne {
         IsAdherent          : boolean | null = null;
-        NumeroAdherent      : string  | null = null;
+        NumeroAdherent      : string         = "";
         TypePersonne        : TypePersonne   = TypePersonne.NonRenseigne;
-        Nom                 : string  | null = null;
-        Age                 : number  | null = null;
-        NumeroPermisConduire: string  | null = null;
-        RaisonSociale       : string  | null = null;
-        FormeJuridique      : string  | null = null;
+        Nom                 : string         = "";
+        Age                 : number | ""    = "";
+        NumeroPermisConduire: string         = "";
+        RaisonSociale       : string         = "";
+        FormeJuridique      : string         = "";
+        DateCreation        : Date | ""      = "";
 
         get IsAdherentInconnu() {
             return this.IsAdherent === true
@@ -34,30 +35,33 @@ namespace App {
         searchByNumeroAdherent(numeroAdherent: string) {
             switch (numeroAdherent) {
                 case "1":
-                    this.TypePersonne = TypePersonne.PersonnePhysique;
-                    this.Nom = "Raymond Devos";
-                    this.Age = 80;
+                    this.TypePersonne         = TypePersonne.PersonnePhysique;
+                    this.Nom                  = "Raymond Devos";
+                    this.Age                  = 80;
                     this.NumeroPermisConduire = "110234";
-                    this.RaisonSociale = null;
-                    this.FormeJuridique = null;
+                    this.RaisonSociale        = "";
+                    this.FormeJuridique       = "";
+                    this.DateCreation         = "";
                     break;
 
                 case "2":
-                    this.TypePersonne = TypePersonne.PersonneMorale;
-                    this.RaisonSociale = "Microsoft";
-                    this.FormeJuridique = "SA";
-                    this.Nom = null;
-                    this.Age = null;
-                    this.NumeroPermisConduire = null;
+                    this.TypePersonne         = TypePersonne.PersonneMorale;
+                    this.RaisonSociale        = "Microsoft";
+                    this.FormeJuridique       = "SA";
+                    this.DateCreation         = new Date(Date.parse("1975-04-04T00:00:00.000Z"));
+                    this.Nom                  = "";
+                    this.Age                  = "";
+                    this.NumeroPermisConduire = "";
                     break;
 
-                default:
-                    this.TypePersonne = TypePersonne.NonRenseigne;
-                    this.RaisonSociale = null;
-                    this.FormeJuridique = null;
-                    this.Nom = null;
-                    this.Age = null;
-                    this.NumeroPermisConduire = null;
+                default: 
+                    this.TypePersonne         = TypePersonne.NonRenseigne;
+                    this.RaisonSociale        = "";
+                    this.FormeJuridique       = "";
+                    this.DateCreation         = "";
+                    this.Nom                  = "";
+                    this.Age                  = "";
+                    this.NumeroPermisConduire = "";
                     break;
             }
         }

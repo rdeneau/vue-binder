@@ -14,6 +14,10 @@ var App;
             var ms = (now.getMilliseconds() / 1000).toPrecision(3).substr(2, 3);
             return hms + "." + ms;
         }
+        function clearLogs() {
+            $("#changes").empty();
+        }
+        Logger.clearLogs = clearLogs;
         function logChanges(propName, propValue) {
             var prop = {};
             prop[propName] = propValue;
@@ -28,14 +32,24 @@ var App;
         }
         Logger.logModel = logModel;
     })(Logger || (Logger = {}));
+    function getTime(value) {
+        return value && value.getTime ? value.getTime() : 0;
+    }
     var model = new App.Personne();
     var handlers = {
+        DateCreation: function (value) {
+            var $dateCreation = $("input#DateCreation");
+            var dateCreation = $dateCreation.datepicker("getDate");
+            if (!dateCreation) {
+                $dateCreation.datepicker("setDate", value);
+            }
+        },
         IsAdherent: function (value) {
             $("#blocSaisiePersonne")
-                .find("input, select, input-group-btn")
+                .find("input, input-group-btn, select")
                 .prop("disabled", value !== false);
             if (value) {
-                model.NumeroAdherent = "";
+                handlers.NumeroAdherent(model.NumeroAdherent);
             }
         },
         NumeroAdherent: function (value) {
@@ -43,7 +57,17 @@ var App;
         }
     };
     $(function () {
+        $("#btnClearLogs").click(function () {
+            Logger.clearLogs();
+        });
+        $(".container .input-group.date").datepicker({
+            autoclose: true,
+            language: "fr",
+            todayBtn: "linked",
+            todayHighlight: true
+        });
         App.vm = new Vue.Binder({
+            model: model,
             root: ".container",
             listener: function (propName, propValue) {
                 Logger.logModel();
@@ -53,7 +77,7 @@ var App;
                     handler(propValue);
                 }
             },
-            model: model
+            converters: Vue.localeConverters.fr
         });
         Logger.logModel();
     });

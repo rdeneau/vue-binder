@@ -1,4 +1,15 @@
+.inline-block { display: inline-block; }
+.width-auto { width: auto; }
+
 .mb0 { margin-bottom:  0   !important; }
+.mbs { margin-bottom:  5px !important; }
 .mbm { margin-bottom: 10px !important; }
+.ml0 { margin-left  :  0   !important; }
+.mls { margin-left  :  5px !important; }
+.mlm { margin-left  : 10px !important; }
+.mr0 { margin-right :  0   !important; }
+.mrs { margin-right :  5px !important; }
+.mrm { margin-right : 10px !important; }
 .mt0 { margin-top   :  0   !important; }
+.mts { margin-top   :  5px !important; }
 .mtm { margin-top   : 10px !important; }

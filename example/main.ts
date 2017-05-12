@@ -1,4 +1,5 @@
 /// <reference path="../src/vue-binder.ts" />
+/// <reference path="datepicker.ts" />
 /// <reference path="personne.ts" />
 
 namespace App {
@@ -37,19 +38,8 @@ namespace App {
         }
     }
 
-    function getTime(value: any) {
-        return value && value.getTime ? value.getTime() : 0;
-    }
-
     const model = new Personne();
     const handlers = {
-        DateCreation: (value: any) => {
-            const $dateCreation = $("input#DateCreation");
-            const dateCreation = $dateCreation.datepicker("getDate");
-            if (!dateCreation) {
-                $dateCreation.datepicker("setDate", value);
-            }
-        },
         IsAdherent: (value: boolean | null) => {
             $("#blocSaisiePersonne")
                 .find("input, input-group-btn, select")
@@ -68,12 +58,7 @@ namespace App {
             Logger.clearLogs();
         });
 
-        $(".container .input-group.date").datepicker({
-            autoclose: true,
-            language: "fr",
-            todayBtn: "linked",
-            todayHighlight: true
-        });
+        DateUtils.initDatePicker(".container .input-group.date");
 
         vm = new Vue.Binder({
             model: model,
@@ -87,7 +72,10 @@ namespace App {
                     handler(propValue);
                 }
             },
-            converters: Vue.localeConverters.fr
+            converters: $.extend(true, {},
+                Vue.localeConverters.fr,
+                { date: DateUtils.getDateConverter() }
+            )
         });
         Logger.logModel();
     });

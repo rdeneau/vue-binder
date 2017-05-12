@@ -32,18 +32,8 @@ var App;
         }
         Logger.logModel = logModel;
     })(Logger || (Logger = {}));
-    function getTime(value) {
-        return value && value.getTime ? value.getTime() : 0;
-    }
     var model = new App.Personne();
     var handlers = {
-        DateCreation: function (value) {
-            var $dateCreation = $("input#DateCreation");
-            var dateCreation = $dateCreation.datepicker("getDate");
-            if (!dateCreation) {
-                $dateCreation.datepicker("setDate", value);
-            }
-        },
         IsAdherent: function (value) {
             $("#blocSaisiePersonne")
                 .find("input, input-group-btn, select")
@@ -60,12 +50,7 @@ var App;
         $("#btnClearLogs").click(function () {
             Logger.clearLogs();
         });
-        $(".container .input-group.date").datepicker({
-            autoclose: true,
-            language: "fr",
-            todayBtn: "linked",
-            todayHighlight: true
-        });
+        App.DateUtils.initDatePicker(".container .input-group.date");
         App.vm = new Vue.Binder({
             model: model,
             root: ".container",
@@ -77,7 +62,7 @@ var App;
                     handler(propValue);
                 }
             },
-            converters: Vue.localeConverters.fr
+            converters: $.extend(true, {}, Vue.localeConverters.fr, { date: App.DateUtils.getDateConverter() })
         });
         Logger.logModel();
     });

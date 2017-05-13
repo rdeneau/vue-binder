@@ -8,9 +8,12 @@ namespace App.DateUtils {
         initLocale();
         return {
             parse: expression => {
-                return expression && expression.length === dateFormat.length
-                             ? moment(expression, dateFormat).toDate()
-                             : null;
+                if ((expression || "").length !== dateFormat.length) {
+                    return null;
+                }
+                const m = moment(expression, dateFormat);
+                m.add(m.utcOffset(), "minute"); // Offset to UTC time to clear time in the date 
+                return m.toDate();
             },
             format: value => {
                 return value ? moment(value).format(dateFormat) : "";
@@ -53,6 +56,8 @@ namespace App.DateUtils {
                 prevCentury : "Siècle précédent",
                 nextCentury : "Siècle suivant"
             }
+        }).on("dp.change", function (this: Element) {
+            $(this).find("input").trigger("input");
         });
     }
 

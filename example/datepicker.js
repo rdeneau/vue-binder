@@ -8,9 +8,12 @@ var App;
             initLocale();
             return {
                 parse: function (expression) {
-                    return expression && expression.length === dateFormat.length
-                        ? moment(expression, dateFormat).toDate()
-                        : null;
+                    if ((expression || "").length !== dateFormat.length) {
+                        return null;
+                    }
+                    var m = moment(expression, dateFormat);
+                    m.add(m.utcOffset(), "minute");
+                    return m.toDate();
                 },
                 format: function (value) {
                     return value ? moment(value).format(dateFormat) : "";
@@ -53,6 +56,8 @@ var App;
                     prevCentury: "Siècle précédent",
                     nextCentury: "Siècle suivant"
                 }
+            }).on("dp.change", function () {
+                $(this).find("input").trigger("input");
             });
         }
         DateUtils.initDatePicker = initDatePicker;

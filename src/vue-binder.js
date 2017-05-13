@@ -42,7 +42,7 @@ var Vue;
             var _this = this;
             this.options = $.extend(true, defaultOptions, options);
             this.model = this.options.model;
-            $(this.options.root).on("change input", this.fieldsSelector, function (event) {
+            $(this.options.root).on("change input", this.getSelector("model") + ":input", function (event) {
                 var $field = $(event.currentTarget);
                 _this.readField($field, true);
             });
@@ -59,17 +59,14 @@ var Vue;
             value = value ? "='" + value + "'" : "";
             return "[data-" + this.options.keys[key] + value + "]";
         };
-        Object.defineProperty(Binder.prototype, "fieldsSelector", {
-            get: function () {
-                var _this = this;
-                return ["input", "select"]
-                    .map(function (tag) { return "" + tag + _this.getSelector("model"); })
-                    .join(", ");
-            },
-            enumerable: true,
-            configurable: true
-        });
+        Binder.prototype.getFieldType = function ($field) {
+            return $field.data(this.options.keys.type)
+                || $field.prop("type");
+        };
         Binder.prototype.getFieldValueCore = function ($field) {
+            if (!$field.is(":input")) {
+                return $field.text();
+            }
             switch ($field.prop("type")) {
                 case "checkbox":
                     var value = $field.prop("checked");
@@ -78,10 +75,6 @@ var Vue;
                     return $("input[type='radio'][name='" + $field.prop("name") + "']" + this.getSelector("model") + ":checked").val();
             }
             return $field.val();
-        };
-        Binder.prototype.getFieldType = function ($field) {
-            return $field.data(this.options.keys.type)
-                || $field.prop("type");
         };
         Binder.prototype.getFieldValue = function ($field) {
             var propValue = this.getFieldValueCore($field);
@@ -111,7 +104,7 @@ var Vue;
         };
         Binder.prototype.refresh = function () {
             var _this = this;
-            var $fields = $(this.options.root).find(this.fieldsSelector);
+            var $fields = $(this.options.root).find(this.getSelector("model"));
             $fields.each(function (_, elem) {
                 var $field = $(elem);
                 if ($field.is(":radio")) {
@@ -144,8 +137,8 @@ var Vue;
             });
         };
         Binder.prototype.setFieldValue = function (propName, propValue) {
-            var $fields = $(this.options.root).find(this.fieldsSelector);
-            var $field = $fields.filter(this.getSelector("model", propName) + ", [name='" + propName + "']");
+            var $fields = $(this.options.root).find(this.getSelector("model"));
+            var $field = $fields.filter(this.getSelector("model", propName) + ", [name='" + propName + "'], [id='" + propName + "']");
             if (propValue === this.getFieldValue($field)) {
                 return;
             }
@@ -161,7 +154,13 @@ var Vue;
                     var type = this.getFieldType($field);
                     var converter = this.options.converters[type] || {};
                     var format = converter.format || (function (val) { return val; });
-                    $field.val(format(propValue));
+                    var value = format(propValue);
+                    if ($field.is(":input")) {
+                        $field.val(value);
+                    }
+                    else {
+                        $field.text(value);
+                    }
             }
             this.options.listener(propName, propValue);
         };

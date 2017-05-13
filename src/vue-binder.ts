@@ -52,7 +52,7 @@ namespace Vue {
             this.options = $.extend(true, defaultOptions, options);
             this.model = this.options.model;
 
-            $(this.options.root).on("change input", this.fieldsSelector, event => {
+            $(this.options.root).on("change input", `${this.getSelector("model")}:input`, event => {
                 const $field = $(event.currentTarget);
                 this.readField($field, true);
             });
@@ -69,13 +69,15 @@ namespace Vue {
             return `[data-${this.options.keys[key]}${value}]`;
         }
 
-        private get fieldsSelector() {
-            return ["input", "select"]
-                        .map(tag => `${tag}${this.getSelector("model")}`)
-                        .join(", ");
+        private getFieldType($field: JQuery) {
+            return $field.data(this.options.keys.type)
+                || $field.prop("type");
         }
 
         private getFieldValueCore($field: JQuery) {
+            if (!$field.is(":input")) {
+                return $field.text();
+            }
             switch ($field.prop("type")) {
                 case "checkbox":
                     const value = $field.prop("checked");
@@ -86,20 +88,15 @@ namespace Vue {
             return $field.val();
         }
 
-        private getFieldType($field: JQuery) {
-            return $field.data(this.options.keys.type)
-                || $field.prop("type");
-        }
-
         private getFieldValue($field: JQuery) {
             let propValue = this.getFieldValueCore($field);
             if (propValue === undefined) {
                 return null;
             }
 
-            const type = this.getFieldType($field);
+            const type      = this.getFieldType($field);
             const converter = this.options.converters[type] || {};
-            const parse = converter.parse || ((val: any) => val);
+            const parse     = converter.parse || ((val: any) => val);
             return parse(propValue);
         }
 
@@ -123,7 +120,7 @@ namespace Vue {
         }
 
         refresh() {
-            const $fields = $(this.options.root).find(this.fieldsSelector);
+            const $fields = $(this.options.root).find(this.getSelector("model"));
             $fields.each((_, elem) => {
                 let $field = $(elem);
                 if ($field.is(":radio")) {
@@ -159,11 +156,12 @@ namespace Vue {
         }
 
         private setFieldValue(propName: string, propValue: any) {
-            const $fields = $(this.options.root).find(this.fieldsSelector);
-            const $field = $fields.filter(`${this.getSelector("model", propName)}, [name='${propName}']`);
+            const $fields = $(this.options.root).find(this.getSelector("model"));
+            const $field = $fields.filter(`${this.getSelector("model", propName)}, [name='${propName}'], [id='${propName}']`);
             if (propValue === this.getFieldValue($field)) {
                 return;
             }
+
             switch ($field.prop("type")) {
                 case "checkbox":
                     $field.prop("checked", !!propValue);
@@ -173,15 +171,22 @@ namespace Vue {
                           .prop("checked", true);
                     break;
                 default:
-                    const type = this.getFieldType($field);
+                    const type      = this.getFieldType($field);
                     const converter = this.options.converters[type] || {};
-                    const format = converter.format || ((val: any) => val);
-                    $field.val(format(propValue));
+                    const format    = converter.format || ((val: any) => val);
+                    const value     = format(propValue);
+                    if ($field.is(":input")) {
+                        $field.val(value);
+                    } else {
+                        $field.text(value);
+                    }
             }
+
             this.options.listener(propName, propValue);
         }
 
         private updateModelProperty(propName: string, propValue: any) {
+            // Handle nested property
             let parent: any = this.model;
             const names = propName.split(".");
             for (let i = 0; i < names.length - 1; i++) {
@@ -193,6 +198,7 @@ namespace Vue {
             }
             propName = names[names.length - 1];
 
+            // Transform bound property from vanilla to get/set
             const propInfo = Object.getOwnPropertyDescriptor(parent, propName);
             if (!propInfo || !propInfo.get) {
                 delete parent[propName];

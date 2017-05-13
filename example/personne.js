@@ -17,6 +17,9 @@ var App;
             this.RaisonSociale = "";
             this.FormeJuridique = "";
             this.DateCreation = "";
+            this.Commentaire = "";
+            this.CommentMaxLength = 0;
+            this.CommentRemainingLength = 0;
         }
         Object.defineProperty(Personne.prototype, "IsAdherentInconnu", {
             get: function () {
@@ -73,6 +76,9 @@ var App;
                     this.NumeroPermisConduire = "";
                     break;
             }
+        };
+        Personne.prototype.updateCommentRemainingLength = function () {
+            this.CommentRemainingLength = this.CommentMaxLength - (this.Commentaire || "").length;
         };
         return Personne;
     }());

@@ -34,6 +34,9 @@ var App;
     })(Logger || (Logger = {}));
     var model = new App.Personne();
     var handlers = {
+        Commentaire: function () {
+            model.updateCommentRemainingLength();
+        },
         IsAdherent: function (value) {
             $("#blocSaisiePersonne")
                 .find("input, input-group-btn, select")
@@ -47,9 +50,8 @@ var App;
         }
     };
     $(function () {
-        $("#btnClearLogs").click(function () {
-            Logger.clearLogs();
-        });
+        $("#btnClearLogs").click(function () { Logger.clearLogs(); });
+        $("#Commentaire").attr("maxlength", model.CommentMaxLength);
         App.DateUtils.initDatePicker(".container .input-group.date");
         App.vm = new Vue.Binder({
             model: model,

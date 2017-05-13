@@ -40,6 +40,9 @@ namespace App {
 
     const model = new Personne();
     const handlers = {
+        Commentaire: () => {
+            model.updateCommentRemainingLength();
+        },
         IsAdherent: (value: boolean | null) => {
             $("#blocSaisiePersonne")
                 .find("input, input-group-btn, select")
@@ -54,9 +57,8 @@ namespace App {
     };
 
     $(() => {
-        $("#btnClearLogs").click(() => {
-            Logger.clearLogs();
-        });
+        $("#btnClearLogs").click(() => { Logger.clearLogs(); });
+        $("#Commentaire").attr("maxlength", model.CommentMaxLength);
 
         DateUtils.initDatePicker(".container .input-group.date");
 

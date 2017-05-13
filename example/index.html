@@ -108,14 +108,26 @@
                 </div>
             </div>
 
-            <div class="form-group" data-vue-show="model.IsAdherent !== null">
-                <label class="control-label col-sm-4">Newsletters</label>
-                <div class="col-sm-8">
-                    <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Culture"   data-vue-model>Culture</label>
-                    <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Economie"  data-vue-model>Economie</label>
-                    <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Politique" data-vue-model>Politique</label>
-                    <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Sante"     data-vue-model checked>Santé</label>
-                    <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Sport"     data-vue-model>Sport</label>
+            <div data-vue-show="model.IsAdherent !== null">
+                <div class="form-group">
+                    <label class="control-label col-sm-4">Newsletters</label>
+                    <div class="col-sm-8">
+                        <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Culture"   data-vue-model>Culture</label>
+                        <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Economie"  data-vue-model>Economie</label>
+                        <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Politique" data-vue-model>Politique</label>
+                        <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Sante"     data-vue-model checked>Santé</label>
+                        <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Sport"     data-vue-model>Sport</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4" for="Commentaire">Commentaire</label>
+                    <div class="col-sm-8">
+                        <textarea class="form-control" name="Commentaire" id="Commentaire" data-vue-model rows="2"></textarea>
+                        <div class="help-block">
+                            <i class="fa fa-fw fa-info-circle"></i> Nombre de caractères maximum : <span data-vue-model="CommentMaxLength" data-vue-type="number">140</span>
+                            <i class="fa fa-fw fa-caret-right"></i> Restant : <span data-vue-model="CommentRemainingLength" data-vue-type="number">140</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 

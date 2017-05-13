@@ -6,15 +6,18 @@ namespace App {
     }
 
     export class Personne {
-        IsAdherent          : boolean | null = null;
-        NumeroAdherent      : string         = "";
-        TypePersonne        : TypePersonne   = TypePersonne.NonRenseigne;
-        Nom                 : string         = "";
-        Age                 : number | ""    = "";
-        NumeroPermisConduire: string         = "";
-        RaisonSociale       : string         = "";
-        FormeJuridique      : string         = "";
-        DateCreation        : Date | ""      = "";
+        IsAdherent            : boolean | null = null;
+        NumeroAdherent                         = "";
+        TypePersonne          : TypePersonne   = TypePersonne.NonRenseigne;
+        Nom                                    = "";
+        Age                   : number | ""    = "";
+        NumeroPermisConduire                   = "";
+        RaisonSociale                          = "";
+        FormeJuridique                         = "";
+        DateCreation          : Date | ""      = "";
+        Commentaire                            = "";
+        CommentMaxLength                       = 0;
+        CommentRemainingLength                 = 0;
 
         get IsAdherentInconnu() {
             return this.IsAdherent === true
@@ -64,6 +67,10 @@ namespace App {
                     this.NumeroPermisConduire = "";
                     break;
             }
+        }
+
+        updateCommentRemainingLength() {
+            this.CommentRemainingLength = this.CommentMaxLength - (this.Commentaire || "").length;
         }
     }
 }

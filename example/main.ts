@@ -1,6 +1,4 @@
-/// <reference path="../src/vue-binder.ts" />
 /// <reference path="datepicker.ts" />
-/// <reference path="personne.ts" />
 
 namespace App {
     export let vm: Vue.Binder;
@@ -27,7 +25,6 @@ namespace App {
         export function logChanges(propName: string, propValue: any) {
             const prop: any = {};
             prop[propName] = propValue;
-            const time = new Date().toLocaleTimeString("fr-FR");
             $("#changes").append($(`<li><code>[${getCurrentTime()}] ${JSON.stringify(prop, null, 2)}</code></li>`));
         }
 
@@ -57,9 +54,6 @@ namespace App {
     };
 
     $(() => {
-        $("#btnClearLogs").click(() => { Logger.clearLogs(); });
-        $("#Commentaire").attr("maxlength", model.CommentMaxLength);
-
         DateUtils.initDatePicker(".container .input-group.date");
 
         vm = new Vue.Binder({
@@ -80,5 +74,8 @@ namespace App {
             )
         });
         Logger.logModel();
+
+        $("#btnClearLogs").click(() => { Logger.clearLogs(); });
+        $("#Commentaire").attr("maxlength", model.CommentMaxLength);
     });
 }

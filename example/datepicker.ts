@@ -1,4 +1,4 @@
-/// <reference path="../src/vue-binder.ts" />
+/// <reference path="../src/binder.ts" />
 
 namespace App.DateUtils {
     let dateFormat = "";
@@ -12,7 +12,7 @@ namespace App.DateUtils {
                     return null;
                 }
                 const m = moment(expression, dateFormat);
-                m.add(m.utcOffset(), "minute"); // Offset to UTC time to clear time in the date 
+                m.add(m.utcOffset(), "minute"); // Offset to UTC time to clear time in the date
                 return m.toDate();
             },
             format: value => {

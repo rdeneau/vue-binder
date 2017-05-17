@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -19,8 +19,8 @@
             <div class="form-group">
                 <label for="IsAdherent" class="control-label col-sm-4">Adhérent</label>
                 <div class="col-sm-8">
-                    <label class="radio-inline"><input type="radio" name="IsAdherent" id="IsAdherent"    value="true"  data-vue-model data-vue-type="boolean">Oui</label>
-                    <label class="radio-inline"><input type="radio" name="IsAdherent" id="IsNotAdherent" value="false" data-vue-model data-vue-type="boolean">Non</label>
+                    <label class="radio-inline"><input type="radio" name="IsAdherent" id="IsAdherent"    value="true"  data-vue-model=":boolean">Oui</label>
+                    <label class="radio-inline"><input type="radio" name="IsAdherent" id="IsNotAdherent" value="false" data-vue-model=":boolean">Non</label>
                 </div>
             </div>
             <div class="form-group" data-vue-show="model.IsAdherent === true">
@@ -43,9 +43,9 @@
                 <div class="form-group">
                     <label for="TypePersonnePhysique" class="control-label col-sm-4">Type de personne</label>
                     <div class="col-sm-8">
-                        <label class="radio-inline"       ><input type="radio" name="TypePersonne" id="TypePersonnePhysique"     value="1" data-vue-model data-vue-type="number"        >Personne Physique</label>
-                        <label class="radio-inline"       ><input type="radio" name="TypePersonne" id="TypePersonneMorale"       value="2" data-vue-model data-vue-type="number"        >Personne Morale</label>
-                        <label class="radio-inline hidden"><input type="radio" name="TypePersonne" id="TypePersonneNonRenseigne" value="0" data-vue-model data-vue-type="number" checked>Non renseigné</label>
+                        <label class="radio-inline"       ><input type="radio" name="TypePersonne" id="TypePersonnePhysique"     value="1" data-vue-model=":number"        >Personne Physique</label>
+                        <label class="radio-inline"       ><input type="radio" name="TypePersonne" id="TypePersonneMorale"       value="2" data-vue-model=":number"        >Personne Morale</label>
+                        <label class="radio-inline hidden"><input type="radio" name="TypePersonne" id="TypePersonneNonRenseigne" value="0" data-vue-model=":number" checked>Non renseigné</label>
                     </div>
                 </div>
 
@@ -98,7 +98,7 @@
                         <label for="DateCreation" class="control-label col-sm-4">Date de création</label>
                         <div class="col-sm-3">
                             <div class="input-group date" data-provide="datepicker">
-                                <input type="text" class="form-control" name="DateCreation" id="DateCreation" data-vue-model data-vue-type="date">
+                                <input type="text" class="form-control" name="DateCreation" id="DateCreation" data-vue-model=":date">
                                 <span class="input-group-addon">
                                     <i class="fa fa-calendar"></i>
                                 </span>
@@ -112,11 +112,11 @@
                 <div class="form-group">
                     <label class="control-label col-sm-4">Newsletters</label>
                     <div class="col-sm-8">
-                        <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Culture"   data-vue-model>Culture</label>
-                        <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Economie"  data-vue-model>Economie</label>
-                        <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Politique" data-vue-model>Politique</label>
-                        <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Sante"     data-vue-model checked>Santé</label>
-                        <label class="checkbox-inline"><input type="checkbox" name="Newsletters.Sport"     data-vue-model>Sport</label>
+                        <label class="checkbox-inline"><input type="checkbox" data-vue-model name="Newsletters.Culture">Culture</label>
+                        <label class="checkbox-inline"><input type="checkbox" data-vue-model name="Newsletters.Economie">Economie</label>
+                        <label class="checkbox-inline"><input type="checkbox" data-vue-model name="Newsletters.Politique">Politique</label>
+                        <label class="checkbox-inline"><input type="checkbox" data-vue-model name="Newsletters.Sante" checked>Santé</label>
+                        <label class="checkbox-inline"><input type="checkbox" data-vue-model name="Newsletters.Sport">Sport</label>
                     </div>
                 </div>
                 <div class="form-group">
@@ -156,7 +156,7 @@
     <script src="../node_modules/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
 
     <script src="../src/converters.js"></script>
-    <script src="../src/vue-binder.js"></script>
+    <script src="../src/binder.js"></script>
     <script src="datepicker.js"></script>
     <script src="personne.js"></script>
     <script src="main.js"></script>

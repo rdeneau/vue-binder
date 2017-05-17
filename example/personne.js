@@ -23,7 +23,7 @@ var App;
         }
         Object.defineProperty(Personne.prototype, "IsAdherentInconnu", {
             get: function () {
-                return this.IsAdherent === true
+                return this.IsAdherent
                     && this.NumeroAdherent.length > 0
                     && this.TypePersonne === null;
             },
@@ -32,7 +32,7 @@ var App;
         });
         Object.defineProperty(Personne.prototype, "IsAdherentRenseigne", {
             get: function () {
-                return this.IsAdherent === true
+                return this.IsAdherent
                     && this.TypePersonne !== TypePersonne.NonRenseigne;
             },
             enumerable: true,

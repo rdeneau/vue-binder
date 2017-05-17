@@ -26,7 +26,7 @@ Syntax uses `date-vue-xxx` attributes on HTML elements.
   <div id="majorInfo" data-vue-show="model.isMajor">...</div>
   <div id="redInfo" data-vue-show="model.color==='red'">...</div>
   ```
-- Use `date-vue-model[='name']` attribute on `input` and `select` tags which values are used for toggling. The name of the property feeded in the model is given by the first non empty value of one of the attributes `date-vue-model`, `name`, `id`. Hence, if you have set the field name attribute, you can leave the `date-vue-model` attribute empty.
+- Use `date-vue-model[='name[:type]']` attribute on `input` and `select` tags which values are used for toggling. The name of the property feeded in the model is given by the first non empty value of one of the attributes `date-vue-model`, `name`, `id`. Hence, if you have set the field name attribute, you can leave the `date-vue-model` attribute empty.
   ```html
   <input type="text" id="address1" data-vue-model>
   <input type="text" name="address2" data-vue-model>
@@ -46,9 +46,21 @@ Syntax uses `date-vue-xxx` attributes on HTML elements.
   }
   ```
 - Model properties are typed:
-  - implicitly: `boolean` for checkbox, `number` for input[type=number], else `string` or
-  - explicitly: with the `data-vue-type` attribute with the value `boolean`, `date` or `number`.
-  - Parsing and formatting can be customized with the `converters` option.
+  - implicitly: `boolean` for checkbox, `number` for input[type=number], else `string`
+  - explicitly: in the `data-vue-model` attribute with the syntax `:${type}`, with type in `boolean`, `date` or `number`. E.g. :
+  ```html
+  <input type="radio" name="choice" id="yes" value="true" data-vue-model=":boolean" checked> Yes
+  <input type="radio" name="choice" id="no" value="false" data-vue-model=":boolean"> No
+  <input type="text" value="2001-01-01" data-vue-model="creationDate:date">
+  ```
+  ```js
+  model === {
+      choice: true,
+      creationDate: new Date(2001, 1, 1)
+  }
+  ```
+  - Parsing and formatting can be customized with the `converters` option. Default converters are provided.
+  - You can use the `data-vue-model` attribute on a non input tag (e.g. SPAN) to display a model property. But you need to initialize it from the view. So it cannot be used with computed property (with ony getter). Use the `listener` option to perform computation and change the property value. See `CommentRemaingLength` in the example.
 
 ### JavaScript/TypeScript
 

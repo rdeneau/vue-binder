@@ -2,12 +2,12 @@ namespace Vue {
     export interface Keys {
         model: string;
         show: string;
-        type: string;
     }
 
     export interface Options {
         converters?: Converters;
         keys?: Keys;
+        typeSeparator?: string;
         listener?: (propName: string, propValue: any) => void;
         model: any;
         root?: string;
@@ -17,10 +17,10 @@ namespace Vue {
         converters: localeConverters.en,
         keys: {
             model: "vue-model",
-            show : "vue-show",
-            type : "vue-type"
+            show : "vue-show"
         },
-        listener: (propName: string, propValue: any) => {},
+        typeSeparator: ":",
+        listener: () => {},
         model: {},
         root: "body"
     };
@@ -42,6 +42,11 @@ namespace Vue {
                                 "ShowBinding:InvalidExpression",
                                 `Invalid expression '${expression}' in data-vue-show attribute: expecting boolean`);
         }
+    }
+
+    interface FieldData {
+        name: string;
+        type: string;
     }
 
     export class Binder {
@@ -69,9 +74,30 @@ namespace Vue {
             return `[data-${this.options.keys[key]}${value}]`;
         }
 
-        private getFieldType($field: JQuery) {
-            return $field.data(this.options.keys.type)
-                || $field.prop("type");
+        private getFieldConverter($field: JQuery): Converter<any> {
+            const propType = this.getFieldData($field).type;
+            return this.options.converters[propType] || {
+                format: (value: any) => value as string,
+                parse : (expression: string) => expression
+            };
+        }
+
+        private getFieldData($field: JQuery): FieldData {
+            let fieldData: FieldData = {
+                name: $field.data(this.options.keys.model),
+                type: null
+            };
+            if (fieldData.name && fieldData.name.indexOf(this.options.typeSeparator) >= 0) {
+                const parts = fieldData.name.split(this.options.typeSeparator).concat([""]);
+                fieldData = {
+                    name: parts[0],
+                    type: parts[1]
+                };
+            }
+            return {
+                name: fieldData.name || $field.prop("name") || $field.prop("id"),
+                type: fieldData.type || $field.prop("type") || "string"
+            };
         }
 
         private getFieldValueCore($field: JQuery) {
@@ -89,21 +115,17 @@ namespace Vue {
         }
 
         private getFieldValue($field: JQuery) {
-            let propValue = this.getFieldValueCore($field);
+            const propValue = this.getFieldValueCore($field);
             if (propValue === undefined) {
                 return null;
             }
 
-            const type      = this.getFieldType($field);
-            const converter = this.options.converters[type] || {};
-            const parse     = converter.parse || ((val: any) => val);
-            return parse(propValue);
+            const converter = this.getFieldConverter($field);
+            return converter.parse(propValue);
         }
 
         private readField($field: JQuery, withRefreshShow: boolean) {
-            const propName = $field.data(this.options.keys.model) as string
-                          || $field.prop("name")
-                          || $field.prop("id");
+            const propName = this.getFieldData($field).name;
             if (!propName) {
                 throw VueError.createModelBindingNameMissing($field[0]);
             }
@@ -128,6 +150,7 @@ namespace Vue {
                     // S'applique à celui qui est coché sinon au 1er du groupe
                     const name = $field.prop("name");
                     const $radios = $fields.filter(`[name='${name}']`);
+                    // ReSharper disable once CssBrowserCompatibility
                     let $radio = $radios.filter(":checked");
                     if ($radio.length === 0) {
                         $radio = $radios.first();
@@ -146,9 +169,10 @@ namespace Vue {
             $(this.options.root).find(this.getSelector("show")).each((_, elem) => {
                 const $element = $(elem);
                 const expression = $element.data(this.options.keys.show) as string;
+                // ReSharper disable once UnusedLocals // `model` can be used in the expression
                 const model = this.modelCopy;
                 const shown = eval(expression);
-                if (typeof shown !== "boolean") {
+                if (typeof shown !== "boolean" && typeof shown !== "undefined" && shown !== null) {
                     throw VueError.createShowBindingInvalidExpression($element[0], expression);
                 }
                 $element.toggle(shown);
@@ -171,10 +195,8 @@ namespace Vue {
                           .prop("checked", true);
                     break;
                 default:
-                    const type      = this.getFieldType($field);
-                    const converter = this.options.converters[type] || {};
-                    const format    = converter.format || ((val: any) => val);
-                    const value     = format(propValue);
+                    const converter = this.getFieldConverter($field);
+                    const value = converter.format(propValue);
                     if ($field.is(":input")) {
                         $field.val(value);
                     } else {

@@ -8,7 +8,7 @@ namespace App {
     export class Personne {
         IsAdherent            : boolean | null = null;
         NumeroAdherent                         = "";
-        TypePersonne          : TypePersonne   = TypePersonne.NonRenseigne;
+        TypePersonne                           = TypePersonne.NonRenseigne;
         Nom                                    = "";
         Age                   : number | ""    = "";
         NumeroPermisConduire                   = "";
@@ -20,13 +20,13 @@ namespace App {
         CommentRemainingLength                 = 0;
 
         get IsAdherentInconnu() {
-            return this.IsAdherent === true
+            return this.IsAdherent
                 && this.NumeroAdherent.length > 0
                 && this.TypePersonne === null;
         }
 
         get IsAdherentRenseigne() {
-            return this.IsAdherent === true
+            return this.IsAdherent
                 && this.TypePersonne !== TypePersonne.NonRenseigne;
         }
 
@@ -57,7 +57,7 @@ namespace App {
                     this.NumeroPermisConduire = "";
                     break;
 
-                default: 
+                default:
                     this.TypePersonne         = TypePersonne.NonRenseigne;
                     this.RaisonSociale        = "";
                     this.FormeJuridique       = "";

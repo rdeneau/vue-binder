@@ -10,6 +10,10 @@ namespace Vue {
         number ?: Converter<number>;
     }
 
+    function numberIsNaN(value: any) {
+        return typeof value === "number" && isNaN(value);
+    }
+
     const defaultEnglishConverters: Converters = {
         boolean: {
             parse: expression => {
@@ -24,7 +28,7 @@ namespace Vue {
         date: {
             parse: expression => {
                 let ms = Date.parse(expression);
-                if (Number.isNaN(ms)) {
+                if (numberIsNaN(ms)) {
                     return null;
                 }
                 const result = new Date(ms);
@@ -38,7 +42,7 @@ namespace Vue {
         number: {
             parse: expression => {
                 const result = parseFloat(expression);
-                return Number.isNaN(result) ? null : result;
+                return numberIsNaN(result) ? null : result;
             },
             format: value => {
                 return value || value === 0 ? value.toString() : "";
@@ -56,7 +60,7 @@ namespace Vue {
                     const utcExpression = `${match[3]}-${match[2]}-${match[1]}T00:00:00.000Z`;
                     ms = Date.parse(utcExpression);
                 }
-                return Number.isNaN(ms) ? null : new Date(ms);
+                return numberIsNaN(ms) ? null : new Date(ms);
             },
             format: value => {
                 return value ? value.toLocaleDateString() : "";
@@ -66,7 +70,7 @@ namespace Vue {
             parse: expression => {
                 expression = expression.replace(",", ".").replace(" ", "");
                 const result = parseFloat(expression);
-                return Number.isNaN(result) ? null : result;
+                return numberIsNaN(result) ? null : result;
             },
             format: value => {
                 return value || value === 0 ? value.toLocaleString("fr", { style: "decimal", useGrouping: false }) : "";

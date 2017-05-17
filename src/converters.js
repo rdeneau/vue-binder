@@ -1,5 +1,8 @@
 var Vue;
 (function (Vue) {
+    function numberIsNaN(value) {
+        return typeof value === "number" && isNaN(value);
+    }
     var defaultEnglishConverters = {
         boolean: {
             parse: function (expression) {
@@ -14,7 +17,7 @@ var Vue;
         date: {
             parse: function (expression) {
                 var ms = Date.parse(expression);
-                if (Number.isNaN(ms)) {
+                if (numberIsNaN(ms)) {
                     return null;
                 }
                 var result = new Date(ms);
@@ -28,7 +31,7 @@ var Vue;
         number: {
             parse: function (expression) {
                 var result = parseFloat(expression);
-                return Number.isNaN(result) ? null : result;
+                return numberIsNaN(result) ? null : result;
             },
             format: function (value) {
                 return value || value === 0 ? value.toString() : "";
@@ -45,7 +48,7 @@ var Vue;
                     var utcExpression = match[3] + "-" + match[2] + "-" + match[1] + "T00:00:00.000Z";
                     ms = Date.parse(utcExpression);
                 }
-                return Number.isNaN(ms) ? null : new Date(ms);
+                return numberIsNaN(ms) ? null : new Date(ms);
             },
             format: function (value) {
                 return value ? value.toLocaleDateString() : "";
@@ -55,7 +58,7 @@ var Vue;
             parse: function (expression) {
                 expression = expression.replace(",", ".").replace(" ", "");
                 var result = parseFloat(expression);
-                return Number.isNaN(result) ? null : result;
+                return numberIsNaN(result) ? null : result;
             },
             format: function (value) {
                 return value || value === 0 ? value.toLocaleString("fr", { style: "decimal", useGrouping: false }) : "";

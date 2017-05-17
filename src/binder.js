@@ -14,10 +14,10 @@ var Vue;
         converters: Vue.localeConverters.en,
         keys: {
             model: "vue-model",
-            show: "vue-show",
-            type: "vue-type"
+            show: "vue-show"
         },
-        listener: function (propName, propValue) { },
+        typeSeparator: ":",
+        listener: function () { },
         model: {},
         root: "body"
     };
@@ -59,9 +59,29 @@ var Vue;
             value = value ? "='" + value + "'" : "";
             return "[data-" + this.options.keys[key] + value + "]";
         };
-        Binder.prototype.getFieldType = function ($field) {
-            return $field.data(this.options.keys.type)
-                || $field.prop("type");
+        Binder.prototype.getFieldConverter = function ($field) {
+            var propType = this.getFieldData($field).type;
+            return this.options.converters[propType] || {
+                format: function (value) { return value; },
+                parse: function (expression) { return expression; }
+            };
+        };
+        Binder.prototype.getFieldData = function ($field) {
+            var fieldData = {
+                name: $field.data(this.options.keys.model),
+                type: null
+            };
+            if (fieldData.name && fieldData.name.indexOf(this.options.typeSeparator) >= 0) {
+                var parts = fieldData.name.split(this.options.typeSeparator).concat([""]);
+                fieldData = {
+                    name: parts[0],
+                    type: parts[1]
+                };
+            }
+            return {
+                name: fieldData.name || $field.prop("name") || $field.prop("id"),
+                type: fieldData.type || $field.prop("type") || "string"
+            };
         };
         Binder.prototype.getFieldValueCore = function ($field) {
             if (!$field.is(":input")) {
@@ -81,15 +101,11 @@ var Vue;
             if (propValue === undefined) {
                 return null;
             }
-            var type = this.getFieldType($field);
-            var converter = this.options.converters[type] || {};
-            var parse = converter.parse || (function (val) { return val; });
-            return parse(propValue);
+            var converter = this.getFieldConverter($field);
+            return converter.parse(propValue);
         };
         Binder.prototype.readField = function ($field, withRefreshShow) {
-            var propName = $field.data(this.options.keys.model)
-                || $field.prop("name")
-                || $field.prop("id");
+            var propName = this.getFieldData($field).name;
             if (!propName) {
                 throw VueError.createModelBindingNameMissing($field[0]);
             }
@@ -130,7 +146,7 @@ var Vue;
                 var expression = $element.data(_this.options.keys.show);
                 var model = _this.modelCopy;
                 var shown = eval(expression);
-                if (typeof shown !== "boolean") {
+                if (typeof shown !== "boolean" && typeof shown !== "undefined" && shown !== null) {
                     throw VueError.createShowBindingInvalidExpression($element[0], expression);
                 }
                 $element.toggle(shown);
@@ -151,10 +167,8 @@ var Vue;
                         .prop("checked", true);
                     break;
                 default:
-                    var type = this.getFieldType($field);
-                    var converter = this.options.converters[type] || {};
-                    var format = converter.format || (function (val) { return val; });
-                    var value = format(propValue);
+                    var converter = this.getFieldConverter($field);
+                    var value = converter.format(propValue);
                     if ($field.is(":input")) {
                         $field.val(value);
                     }
@@ -200,4 +214,4 @@ var Vue;
     }());
     Vue.Binder = Binder;
 })(Vue || (Vue = {}));
-//# sourceMappingURL=vue-binder.js.map
+//# sourceMappingURL=binder.js.map

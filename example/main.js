@@ -21,7 +21,6 @@ var App;
         function logChanges(propName, propValue) {
             var prop = {};
             prop[propName] = propValue;
-            var time = new Date().toLocaleTimeString("fr-FR");
             $("#changes").append($("<li><code>[" + getCurrentTime() + "] " + JSON.stringify(prop, null, 2) + "</code></li>"));
         }
         Logger.logChanges = logChanges;
@@ -50,8 +49,6 @@ var App;
         }
     };
     $(function () {
-        $("#btnClearLogs").click(function () { Logger.clearLogs(); });
-        $("#Commentaire").attr("maxlength", model.CommentMaxLength);
         App.DateUtils.initDatePicker(".container .input-group.date");
         App.vm = new Vue.Binder({
             model: model,
@@ -67,6 +64,8 @@ var App;
             converters: $.extend(true, {}, Vue.localeConverters.fr, { date: App.DateUtils.getDateConverter() })
         });
         Logger.logModel();
+        $("#btnClearLogs").click(function () { Logger.clearLogs(); });
+        $("#Commentaire").attr("maxlength", model.CommentMaxLength);
     });
 })(App || (App = {}));
 //# sourceMappingURL=main.js.map
